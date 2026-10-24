@@ -101,6 +101,34 @@ letter.
 - `OFFICIAL_AI_API_URL`: override the API base URL (defaults to
   `https://theofficial.ai`).
 
+## Input limits
+
+The local MCP server accepts at most 256 KiB of buffered input before JSON parsing
+and 1,024 array elements/object members per tool call before schema validation.
+An oversized stdio buffer closes the connection; reconnect after reducing the input.
+Tool validation errors are returned without contacting the API.
+
+Each capture accepts up to 10 media URLs; each notice accepts up to 20 original URLs
+and 32 extra fields. URLs are limited to 4,096 characters, long descriptions to
+10,000, names/country/report-path identifiers to 256, email to 320, addresses to
+2,000 and phone to 64. Extra-field names allow 128 characters and values 2,000.
+Split a larger submission into smaller tool calls. These are client resource limits,
+not a statement about what the hosted API accepts.
+
+## Development
+
+Use the patched Node version in `.node-version` or `.nvmrc`, then:
+
+```bash
+npm ci --ignore-scripts
+npm test
+npm audit
+```
+
+Tests build the CLI, exercise all four tools with mocked API responses, and check
+oversized/invalid input and the actual stdio entry point. CI runs type checks,
+tests and dependency auditing on both supported Node release lines.
+
 ## License
 
 Apache-2.0. See [LICENSE](./LICENSE).
